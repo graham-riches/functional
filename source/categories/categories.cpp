@@ -17,15 +17,6 @@
  * @return 
 */
 template <typename T>
-T identity(T& param){
-    return param;
-}
-
-/**
- * @brief same as above but for rvalue references
- * @return 
-*/
-template <typename T>
 T identity(T&& param){
     return param;
 }
@@ -38,7 +29,7 @@ T identity(T&& param){
  * @return composed function object
 */
 template <typename F, typename G, typename ...Args>
-auto compose(F f, G g, Args... args){
+auto compose(F&& f, G&& g, Args... args){
     auto function = [f, g, args...](){return f(g(args...));};
     return function;
 }
@@ -72,7 +63,14 @@ int main( int argc, char *argv[] )
    auto func = compose(plus_one, multiply_by_two, 5);
    std::cout << "Composed function value: " << func() << "\n";
 
+   /* composing with identity requires instantiating the identity type explicitely, which is bad */
+   auto test = compose(identity<int>, multiply_by_two, 5);
+   bool is_valid_composition = test() == 10;
+   std::cout << "Composed function with identity is valid: " << is_valid_composition << "\n";
 
+   /* applying identity to another function object is however, totally valid */
+   auto identity_of_function = identity(func);
+   std::cout << "Identity of a function is just the function: " << identity_of_function() << "\n";
    return 0;   
 }
 
