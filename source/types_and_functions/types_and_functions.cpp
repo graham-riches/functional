@@ -64,8 +64,8 @@ public:
         auto start = std::chrono::high_resolution_clock::now();
         auto result = m_function(std::forward<Args>(args)...);
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "Elapsed Time: " << std::chrono::duration_cast<Duration>(end - start).count() << "\n";
-        return result;
+        auto duration = std::chrono::duration_cast<Duration>(end - start).count();
+        return std::make_pair(result, duration);
     }
 
 private:
@@ -108,18 +108,22 @@ int main( int argc, char *argv[] ) {
     auto timed_factorial = time_it(memoized_factorial, std::chrono::nanoseconds());
     
     /* run the function the first time, which should take a bit longer since the result is not cached */
-    auto non_cached = timed_factorial(20);    
+    auto non_cached = timed_factorial(20);
+    std::cout << "Non cached value: " << non_cached.first << " Elapsed Time: " << non_cached.second << "\n";
 
     /* repeat with caching */
     auto cached = timed_factorial(20);
+    std::cout << "Cached value: " << cached.first << " Elapsed Time: " << cached.second << "\n";
 
     /* cached random number generator with srand setting the seeding */
     std::srand(1);
     auto memoized_random = memoize(std::rand);
     auto timed_random = time_it(memoized_random, std::chrono::nanoseconds());
     auto random_no_cache = timed_random();
+    std::cout << "Non cached value: " << random_no_cache.first << " Elapsed Time: " << random_no_cache.second << "\n";
     std::srand(1); //!< reseed the generator
     auto random_cache = timed_random();
+    std::cout << "Cached value: " << random_cache.first << " Elapsed Time: " << random_cache.second << "\n";
 
    return 0;   
 }

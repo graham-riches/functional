@@ -49,8 +49,8 @@ public:
         auto start = std::chrono::high_resolution_clock::now();
         auto result = m_function(std::forward<Args>(args)...);
         auto end = std::chrono::high_resolution_clock::now();
-        std::cout << "Elapsed Time: " << std::chrono::duration_cast<Duration>(end - start).count() << "\n";
-        return result;
+        auto duration = std::chrono::duration_cast<Duration>(end - start).count();
+        return std::make_pair(result, duration);
     }
 
 private:
@@ -93,10 +93,12 @@ int main( int argc, char *argv[] ) {
     auto timed_factorial = time_it(memoized_factorial, std::chrono::nanoseconds());
     
     /* run the function the first time, which should take a bit longer since the result is not cached */
-    auto non_cached = timed_factorial(20);    
+    auto non_cached = timed_factorial(20);
+    std::cout << "Non cached value: " << non_cached.first << " Elapsed Time: " << non_cached.second << "\n";
 
     /* repeat with caching */
     auto cached = timed_factorial(20);
+    std::cout << "Cached value: " << cached.first << " Elapsed Time: " << cached.second << "\n";
 
    return 0;   
 }
@@ -104,8 +106,8 @@ int main( int argc, char *argv[] ) {
 
 Produces
 ```
-Elapsed Time: 9100
-Elapsed Time: 1900
+Non cached value: 2432902008176640000 Elapsed Time: 19000
+Cached value: 2432902008176640000 Elapsed Time: 2500
 ```
 
 ## Try to memoize a function from your standard library that you normally use to produce random numbers. Does it work? Most random number generators can be initialized with a seed. Implement a function that takes a seed, calls the random number generator with that seed, and returns the result. Memoize that function. Does it work?
@@ -120,16 +122,17 @@ std::srand(1);
 auto memoized_random = memoize(std::rand);
 auto timed_random = time_it(memoized_random, std::chrono::nanoseconds());
 auto random_no_cache = timed_random();
+std::cout << "Non cached value: " << random_no_cache.first << " Elapsed Time: " << random_no_cache.second << "\n";
 std::srand(1); //!< reseed the generator
 auto random_cache = timed_random();
-
+std::cout << "Cached value: " << random_cache.first << " Elapsed Time: " << random_cache.second << "\n";
 ...
 ```
 
 Produces
 ```
-Elapsed Time: 2800
-Elapsed Time: 1700
+Non cached value: 41 Elapsed Time: 3500
+Cached value: 41 Elapsed Time: 1800
 ```
 
 ## Which of these C++ functions are pure? Try to memoize them and observe what happens when you call them multiple times: memoized and not.
