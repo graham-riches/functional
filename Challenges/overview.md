@@ -1,0 +1,2 @@
+# Overview
+This directory contains solutions to the challenge problems from the CTFP book. More solutions can be found [here for reference](https://github.com/awalterschulze/category-theory-for-programmers-challenges)
