@@ -33,4 +33,5 @@ include_directories(${Boost_INCLUDE_DIRS}
 # add subdirectories
 add_subdirectory(source/categories)
 add_subdirectory(source/types_and_functions)
+add_subdirectory(source/kleisli_categories)
 
