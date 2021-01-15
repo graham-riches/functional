@@ -18,30 +18,9 @@
 #include <ranges>
 #include <chrono>
 #include <cstdlib>
+#include <optional>
 
 /****************************** Types ***********************************/
-/**
- * @brief embellished optional type. Note: not using std::optional just for the practice of writing templates
- * @tparam A parameterized type of the optional
-*/
-template<class A>
-class Optional {
-private:
-    bool _is_valid;
-    A _value;
-
-public:
-    Optional() : _is_valid(false) {};
-    Optional(A x) : _is_valid(true), _value(x) {};
-
-    bool is_valid() const {
-        return _is_valid;
-    }
-
-    A value() const {
-        return _value;
-    }
-};
 
 
 /****************************** Function Definitions ***********************************/
@@ -50,8 +29,8 @@ public:
  * @param x 
  * @return 
 */
-Optional<double> safe_root(double x) {
-    return (x >= 0) ? Optional<double>{sqrt(x)} : Optional<double>{};
+std::optional<double> safe_root(double x) {
+    return (x >= 0) ? std::make_optional<double>(sqrt(x)) : std::make_optional<double>();
 }
 
 
@@ -60,11 +39,27 @@ Optional<double> safe_root(double x) {
  * @param x 
  * @return 
 */
-Optional<double> safe_reciprocal(double x) {
-    return (x != 0) ? Optional<double>{1/x} : Optional<double>{};
+std::optional<double> safe_reciprocal(double x) {
+    return (x != 0) ? std::make_optional<double>(1/x) : std::make_optional<double>();
 }
 
 
+/**
+ * @brief monad bind defined for std optionals to allow composition/ chaining
+ * @tparam T 
+ * @tparam F 
+ * @param opt 
+ * @param f 
+ * @return 
+*/
+template <typename T, typename F>
+auto mbind(const std::optional<T>& opt, F f) -> decltype(f(opt.value())) {
+    if (opt) {
+        return f(opt.value());
+    } else {
+        return {}
+    }
+}
 
 /**
 * @brief main application entry point
