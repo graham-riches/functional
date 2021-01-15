@@ -42,6 +42,42 @@ auto mbind(const std::optional<T>& opt, F f) -> decltype(f(opt.value())) {
 }
 
 /**
+ * @brief monadic compose function. Returns a function object with that returns an instance of the monad type
+ * @tparam F first monad function 
+ * @tparam G second monad function
+ * @return 
+*/
+template <typename F, typename G>
+auto mcompose(F f, G g) {
+    return [=](auto value) {
+        return mbind(f(value), g);
+    }
+}
+
+/**
+ * @brief identity for optionals
+ * @tparam T 
+ * @param x 
+ * @return 
+*/
+template<typename T>
+std::optional<T> identity(std::optional<T> &x){
+    return x;
+}
+
+/**
+ * @brief alternative more generic identity
+ * @tparam T 
+ * @param x 
+ * @return 
+*/
+template <typename T>
+T identity(T &x) {
+    return x;
+}
+
+
+/**
  * @brief safe square root function that returns an optional. Note: this could also be a template
  * @param x 
  * @return 
