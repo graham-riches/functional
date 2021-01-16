@@ -114,3 +114,19 @@ std::optional<double> safe_root_reciprocal(double x){
     return mbind(safe_reciprocal(x), safe_root);
 }
 ```
+
+Alternatively, we could use a more generic compose function like the one below. On the other hand, this function is still not perfect as it can only accept a single argument into the returned function object. Perhaps a variadic template could be even better?
+```cpp
+/**
+ * @brief monadic compose function. Returns a function object with that returns an instance of the monad type
+ * @tparam F first monad function 
+ * @tparam G second monad function
+ * @return 
+*/
+template <typename F, typename G>
+auto mcompose(F f, G g) {
+    return [=](auto value) {
+        return mbind(f(value), g);
+    }
+}
+```
